@@ -1,0 +1,1 @@
+Project is currently in 'DEMO' folder of that project

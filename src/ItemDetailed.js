@@ -2,13 +2,13 @@ import React from 'react';
 
 function ItemDetailed(props) {
   return <div className="ItemBackGround text-right">
-    <h1 >קציצות חומוס אפויות</h1>
+    <h1 >{props.title}</h1>
 
     <div className="container mt-5">
       <div className="row">
         <div className="col-md-5">
           <img className="card-img-top" ng-src="https://parsefiles.back4app.com/Ubmbhqz8eIdPXGrtk00xDzb9xm9nJHfkf8mtsGyZ/9c2751c1d4080cbd9e8030ecc2cd5b12_NaN.jpeg" alt="קציצות חומוס אפויות" 
-          src={props.url} />
+          src={props.PicUrl || props.url} />
         </div>
         <div className="col-md-7">
           <div className="row">

@@ -8,6 +8,13 @@ body
   background-size: cover;
 }
 */
+.mainItemError
+{
+  /*height: 100% !important;*/
+  height: 5em !important;
+  /*height: 300px;*/
+
+}
 
 .LastUpdate
 {

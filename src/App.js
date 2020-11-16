@@ -1,5 +1,5 @@
 //const {getData} = require('./api/jsonPlaceholder');
-import {GetDateTime} from  './utils/time.js';
+import { GetDateTime } from './utils/time.js';
 
 
 import React, { useState, useEffect } from 'react';
@@ -12,7 +12,7 @@ import ItemDetailed from './ItemDetailed';
 import AddItem from './AddItem.js';
 
 function App() {
-  let urlCurrentItem="";
+  let urlCurrentItem = "";
 
   const Images = [
     {
@@ -53,7 +53,8 @@ function App() {
       id: 5,
       title: "Cheese Pancake test",
       LastUpdate: 0,
-      PicId: 0
+      PicId: 0,
+      Pic: undefined
     }
   ]  // default test data
 
@@ -62,7 +63,8 @@ function App() {
   const [Items, setItems] = useState(ItemsDefault);
   //const [IsMainPage, setMainPage] = useState(true);
   const [PageNumber, setPage] = useState(1);
-  const [chosenItemImageUrl,setChosenImageUrl]=useState("");
+  const [chosenItemImageUrl, setChosenImageUrl] = useState("");
+  const [chosenTitle, setChosenTitle] = useState("");
   // need to get items from internet using fetch
 
   let BaseUrl = 'https://jsonplaceholder.typicode.com/';
@@ -72,14 +74,25 @@ function App() {
 
   useEffect(async () => {
     //const jsonUsers = await getUsers();
-        //setUsers(jsonUsers);
-        let pPosts = fetch(`${BaseUrl}posts`);
-        const PostsAllData=await pPosts;
-        const PostsJson=await PostsAllData.json();
-        GlobalItems=PostsJson.slice(0,12);
-        setItems(GlobalItems.map((i,index) => { return { ...i, Views: 0, PicId: index, LastUpdate: GetDateTime() } }));
+    //setUsers(jsonUsers);
+    let pPosts = fetch(`${BaseUrl}posts`);
+    const PostsAllData = await pPosts;
+    const PostsJson = await PostsAllData.json();
+    GlobalItems = PostsJson.slice(0, 12);
+    setItems(GlobalItems.map((i, index) => { return { ...i, Views: 0, PicUrl: "", PicId: index, LastUpdate: GetDateTime() } }));
 
-},[]);
+  }, []);
+
+  function AddItemToArray(NewItem) {
+    // get highest id of current array
+    Items.push({ Views: 0, id: (1000 + Items.length), PicId: (1000 + Items.length), LastUpdate: GetDateTime(), PicUrl: NewItem.PicUrl, title: NewItem.Title });
+    const NewItems = [...Items];
+
+    setItems(NewItems);
+    setPage(1);  // back to main...
+
+
+  }
 
   // let PostsJson = pPostsJson.then(response => {
   //   GlobalItems = response.slice(0, 12); // get 12 posts...
@@ -88,35 +101,36 @@ function App() {
   // }
   // );
 
-  
-  function GoToNewItemPage()
-  {
+
+  function GoToNewItemPage() {
     //PageNumber=3;
     setPage(3);
     //console.log(`Page Number is ${PageNumber}`);
   }
 
 
-  function changePageByState(item,imageUrl) {
-//    if (IsMainPage) {  // only update views if state is main page
-      if (PageNumber==1) {  // only update views if state is main page
-        //url     
+  function changePageByState(item, imageUrl) {
+    //    if (IsMainPage) {  // only update views if state is main page
+    if (PageNumber == 1) {  // only update views if state is main page
+      //url     
       setChosenImageUrl(imageUrl); // picture 
       console.log(`new chosen image url is ${imageUrl}`);
       item.Views++;
       console.log('item is:');
       console.log(item);
-      const NewItems=Items.sort(function (a, b) { return b.Views - a.Views }).map(i=>({...i,Views:(i.Views),LastUpdate:GetDateTime()}));
+      setChosenTitle(item.title);
+
+      const NewItems = Items.sort(function (a, b) { return b.Views - a.Views }).map(i => ({ ...i, Views: (i.Views), LastUpdate: GetDateTime() }));
       console.log(NewItems);
       //debugger;
       setItems(NewItems);
     }
     //debugger;
     //setMainPage(!IsMainPage);  // flip pages
-    if (PageNumber==1)
-     setPage(2);
-    if (PageNumber==2)
-     setPage(1);
+    if (PageNumber == 1)
+      setPage(2);
+    if (PageNumber == 2)
+      setPage(1);
   }
 
 
@@ -127,16 +141,16 @@ function App() {
       <div className="container mt-3 hebrew App">
         {/* The actual recipe: */}
         {/* {!IsMainPage && */}
-        {PageNumber==2 &&
+        {PageNumber == 2 &&
           <>
-            <ItemDetailed url={chosenItemImageUrl} Me={{}} onClickMe={changePageByState}  />
+            <ItemDetailed title={chosenTitle} url={chosenItemImageUrl} Me={{}} onClickMe={changePageByState} />
           </>
         }
 
         {
-          PageNumber==3 && 
+          PageNumber == 3 &&
           <>
-          <AddItem />
+            <AddItem OnAddItem={AddItemToArray} />
           </>
         }
         <div className="row" >
@@ -146,7 +160,7 @@ function App() {
 
 
         {/* {IsMainPage && */}
-        {PageNumber==1 &&
+        {PageNumber == 1 &&
           <>
             <TopSearch />
 
@@ -155,7 +169,7 @@ function App() {
               <div className="row flex-grow-1" >
                 {
                   //console.log(IsMainPage)
-                  Items.map((i, index) => <Item LastUpdate={i.LastUpdate} Me={i} Views={i.Views} onClickMe={changePageByState} key={index} url={Images[i.PicId % Images.length].url} Itemname={i.title} email='itaysen@gmail.com' />)
+                  Items.map((i, index) => <Item PicUrl={i.PicUrl} LastUpdate={i.LastUpdate} Me={i} Views={i.Views} onClickMe={changePageByState} key={index} url={Images[i.PicId % Images.length].url} Itemname={i.title} email='itaysen@gmail.com' />)
                 }
               </div>
 

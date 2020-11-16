@@ -1,15 +1,118 @@
-import React from 'react';
+import React, { useState } from 'react';
+import validate from './utils/validator';
+import Errors from './Errors';
+
+
+// Example item
+// {
+//     ItemId: 1,
+//     id: 5,s
+//     title: "Cheese Pancake test",
+//     LastUpdate: 0,
+//     PicId: 0,
+//     Pic:undefined
+//   }
 
 function AddItem(props) {
+    const [item, setItem] = useState({
+        recipeName: { value: '', required: true, minLength: 5, errors: [] },
+        recipeImgUpload: { value: '', required: true, minLength: 12, errors: [] }  // later have http pattern
 
-    return <form name="recipeForm" id="recipeForm" className="ng-scope ng-invalid ng-invalid-required ng-valid-image ng-valid-parsing ng-valid-dimensions ng-valid-size ng-dirty ng-valid-parse">
+        // username: {value:'', required: true, minLength: 2, errors: []},
+        // email:    {value:'', required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, errors: []},
+
+        // address:  {value:'', required: true, minLength: 10, errors: []},
+        // course:   {value:'', required: true, errors: []},
+        // gender:   {value:'', required: true, errors: []}
+    });
+
+    const onInputChange = (e) => {
+        console.log(e.target.name, e.target.value);
+
+        const newErrors = validate(
+            e.target.name,
+            e.target.value,
+            item[e.target.name].required,
+            item[e.target.name].minLength,
+            item[e.target.name].pattern
+        );
+
+        setItem({
+            ...item,
+            [e.target.name]: {
+                ...item[e.target.name],
+                value: e.target.value,
+                errors: newErrors
+            }
+        });
+    }
+
+    const onSubmit = e => {
+        e.preventDefault();
+        for (const field in item) {
+            const newErrors = validate(
+                field,
+                item[field].value,
+                item[field].required,
+                item[field].minLength,
+                item[field].pattern
+            );
+
+            item[field] = {
+                ...item[field],
+                errors: newErrors
+            };
+        }
+
+        setItem({ ...item });
+        const rawItem = Object.keys(item)
+            .reduce((st, prop) => {
+                st[prop] = item[prop].value;
+                return st;
+            }, {});
+
+        console.log(rawItem);
+
+        //onSubmit={onSubmit}
+        // currently: check if errors in recipe name, filename.
+        // otherwise: alert the two items
+        if (item.recipeName.errors.length==0)
+         if (item.recipeImgUpload.errors.length==0)
+         {
+             const NewItem={Title:item.recipeName.value,PicUrl:item.recipeImgUpload.value};
+             const s=JSON.stringify(NewItem);
+             alert(s);
+             props.OnAddItem(NewItem);
+             //props.st call function here!!!
+
+             //https://img.theculturetrip.com/1440x807/smart/wp-content/uploads/2015/12/56-3698740-test.jpg
+             // now need to add this to general item array....
+         }
+
+    }
+
+
+    function NewItem() {
+        alert('hi');
+        //onsubmit
+
+        //onSubmit={onSubmit}
+        // use class system to get form values......
+
+    }
+
+    return <form onSubmit={onSubmit} name="recipeForm" id="recipeForm" className="ng-scope ng-invalid ng-invalid-required ng-valid-image ng-valid-parsing ng-valid-dimensions ng-valid-size ng-dirty ng-valid-parse">
         <div className="form-row">
             <div className="form-group col-md-6">
                 {/* <!-- 1 --> */}
                 <label for="recipeName">שם המתכון</label>
-                <input type="input" className="form-control ng-pristine ng-empty ng-invalid ng-invalid-required ng-touched" name="recipeName" id="recipeName" placeholder="שם המתכון" ng-model="recipe.recipeName" required="" />
-                <div ng-show="recipeForm.recipeName.$touched &amp;&amp; recipeForm.recipeName.$invalid" className="mt-2 form-control alert alert-danger" role="alert">
-                    "שם המתכון" הוא שדה חובה
+                {/* defaultValue={student.username.value} */}
+                <input onBlur={onInputChange} defaultValue={item.recipeName.value} type="input" className="form-control ng-pristine ng-empty ng-invalid ng-invalid-required ng-touched" name="recipeName" id="recipeName" placeholder="שם המתכון" ng-model="recipe.recipeName" required="" />
+                <div ng-show="recipeForm.recipeName.$touched &amp;&amp; recipeForm.recipeName.$invalid" className="mainItemError mt-2 form-control alert alert-danger" role="alert">
+                    {/* "שם המתכון" הוא שדה חובה */}
+                    {
+                                <Errors errors={item.recipeName.errors} />
+                            }
           </div>
             </div>
             <div className="form-group col-md-3">
@@ -27,13 +130,48 @@ function AddItem(props) {
                     </div>
                 </div>
             </div>
-            <div className="form-group col-md-3">
+
+            {/* <div className="form-group col-md-3"> */}
+            {/* <div className="form-group col-md-3">
                 <div className="form-group">
-                    <label for="recipeImgUpload">תמונה ראשית</label>
-                    <input type="file" image-with-preview="" className="form-control-file ng-pristine ng-untouched ng-valid ng-isolate-scope ng-empty ng-valid-image ng-valid-parsing ng-valid-dimensions ng-valid-size" id="recipeImgUpload" ng-model="recipe.recipeImg" accept="image/*" />
+                    <label for="recipeImgUpload">תמונה ראשית - קישור</label> */}
+                    {/* <input type="file" image-with-preview="" className="form-control-file ng-pristine ng-untouched ng-valid ng-isolate-scope ng-empty ng-valid-image ng-valid-parsing ng-valid-dimensions ng-valid-size" id="recipeImgUpload" ng-model="recipe.recipeImg" accept="image/*" /> */}
+                    {/* commented out by itay - picture is link to http resuourse */}
+                    {/* <input onBlur={onInputChange} defaultValue={item.recipeImgUpload.value} type="input" className="form-control ng-pristine ng-empty ng-invalid ng-invalid-required ng-touched" name="recipeImgUpload" id="recipeImgUpload" placeholder="תמונה ראשית" ng-model="recipe.recipeName" required="" /> */}
+
+                    {/* itay */}
+                    {/* <div  className="mainItemError mt-2 form-control alert alert-danger" role="alert">
+                    {
+                                <Errors errors={item.recipeImgUpload.errors} />
+                            }
+          </div>
                 </div>
-            </div>
+            </div> */}
+
+            
         </div>
+
+        <div className="form-row">
+            <div className="form-group col-md-6">
+            <div className="form-group">
+                    <label for="recipeImgUpload">תמונה ראשית - קישור</label>
+                    {/* <input type="file" image-with-preview="" className="form-control-file ng-pristine ng-untouched ng-valid ng-isolate-scope ng-empty ng-valid-image ng-valid-parsing ng-valid-dimensions ng-valid-size" id="recipeImgUpload" ng-model="recipe.recipeImg" accept="image/*" /> */}
+                    {/* commented out by itay - picture is link to http resuourse */}
+                    <input onBlur={onInputChange} defaultValue={item.recipeImgUpload.value} type="input" className="form-control ng-pristine ng-empty ng-invalid ng-invalid-required ng-touched" name="recipeImgUpload" id="recipeImgUpload" placeholder="תמונה ראשית" ng-model="recipe.recipeName" required="" />
+
+                    {/* itay */}
+                    <div  className="mainItemError mt-2 form-control alert alert-danger" role="alert">
+                    {
+                                <Errors errors={item.recipeImgUpload.errors} />
+                            }
+          </div>
+                </div>
+
+                </div>
+                </div>
+
+
+
         <div className="form-row">
             <div className="form-group col-md-9">
                 {/* <!-- 2 --> */}
@@ -318,7 +456,10 @@ function AddItem(props) {
           </div>
             </div>
             <div className="col align-left">
-                <input className="btn btn-primary" type="button" value="שמור מתכון" ng-click="addRecipe()" ng-disabled="recipeForm.$invalid" disabled="disabled" />
+                {/* <input className="btn btn-primary" onClick={() => { NewItem() }} type="button" value="שמור מתכון" ng-click="addRecipe()" ng-disabled="recipeForm.$invalid" /> */}
+                <button type="submit" className="btn btn-primary btn-block">שמור מתכון</button>
+
+                {/* <input className="btn btn-primary" onClick={() => {NewItem()}} type="button" value="שמור מתכון" ng-click="addRecipe()" ng-disabled="recipeForm.$invalid" disabled="disabled" /> */}
             </div>
         </div>
     </form>

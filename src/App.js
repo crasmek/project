@@ -116,11 +116,12 @@ function App() {
       setChosenImageUrl(imageUrl); // picture 
       console.log(`new chosen image url is ${imageUrl}`);
       item.Views++;
+      item.LastUpdate=GetDateTime();
       console.log('item is:');
       console.log(item);
       setChosenTitle(item.title);
 
-      const NewItems = Items.sort(function (a, b) { return b.Views - a.Views }).map(i => ({ ...i, Views: (i.Views), LastUpdate: GetDateTime() }));
+      const NewItems = Items.sort(function (a, b) { return b.Views - a.Views }).map(i => ({ ...i, Views: (i.Views), LastUpdate: i.LastUpdate }));
       console.log(NewItems);
       //debugger;
       setItems(NewItems);

@@ -5,7 +5,7 @@ return <div>
 <div>
 <nav className="hebrew col-12 navbar navbar-expand-md bg-dark navbar-dark">
     <div className="container">
-      <a className="navbar-brand ng-binding" href="#!/">מחברת המתכונים  של חמו</a>
+      <a className="navbar-brand ng-binding" href="#!/">מחברת המתכונים  של איתי</a>
       <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
         <span className="navbar-toggler-icon"></span>
       </button>

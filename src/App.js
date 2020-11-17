@@ -11,8 +11,18 @@ import TopSearch from './TopSearch';
 import ItemDetailed from './ItemDetailed';
 import AddItem from './AddItem.js';
 
+import { getRecipes } from "./utils/edamam";
+
+
+
+
 function App() {
   let urlCurrentItem = "";
+
+  // const getRecipesFromApi = async () => {
+  //   const apiRecipes = await getRecipes(0, 15, "icecream");
+  //   setRecipes(apiRecipes);
+  // };
 
   const Images = [
     {
@@ -75,11 +85,21 @@ function App() {
   useEffect(async () => {
     //const jsonUsers = await getUsers();
     //setUsers(jsonUsers);
-    let pPosts = fetch(`${BaseUrl}posts`);
-    const PostsAllData = await pPosts;
-    const PostsJson = await PostsAllData.json();
-    GlobalItems = PostsJson.slice(0, 12);
-    setItems(GlobalItems.map((i, index) => { return { ...i, Views: 0, PicUrl: "", PicId: index, LastUpdate: GetDateTime() } }));
+
+    //These 3 lines commented out 17/11/2020:
+    // let pPosts = fetch(`${BaseUrl}posts`);
+    // const PostsAllData = await pPosts;
+    // const PostsJson = await PostsAllData.json();
+
+    const apiRecipes = await getRecipes(0, 16, "icecream");
+    //setRecipes(apiRecipes);
+
+    //GlobalItems = PostsJson.slice(0, 12);
+    GlobalItems=apiRecipes;
+    //setItems(GlobalItems.map((i, index) => { return { ...i, Views: 0, PicUrl: "", PicId: index, LastUpdate: GetDateTime() } }));
+    setItems(GlobalItems.map((i, index) => { return { ...i, Views: 0, PicId: index, LastUpdate: GetDateTime() } }));
+
+
 
   }, []);
 

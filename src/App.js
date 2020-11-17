@@ -14,6 +14,7 @@ import AddItem from './AddItem.js';
 import { getRecipes } from "./utils/edamam";
 
 
+const localStorageKey="recipeProjectApplseeds";
 
 
 function App() {
@@ -91,13 +92,28 @@ function App() {
     // const PostsAllData = await pPosts;
     // const PostsJson = await PostsAllData.json();
 
-    const apiRecipes = await getRecipes(0, 16, "icecream");
+    //let jsonUsers;
+
+    if(!localStorage.getItem(localStorageKey)){
+        //jsonUsers = await getUsers();
+        const apiRecipes=await getRecipes(0, 16, "icecream");
+        GlobalItems=apiRecipes.map((i, index) => { return { ...i, Views: 0, PicId: index, LastUpdate: GetDateTime() } });
+
+
+        localStorage.setItem(localStorageKey, JSON.stringify(GlobalItems));
+    }else{
+        GlobalItems = JSON.parse(localStorage.getItem(localStorageKey));
+    }
+
+    //const apiRecipes = await getRecipes(0, 16, "icecream"); // itay commented out
+
     //setRecipes(apiRecipes);
 
     //GlobalItems = PostsJson.slice(0, 12);
-    GlobalItems=apiRecipes;
+    //GlobalItems=apiRecipes;
     //setItems(GlobalItems.map((i, index) => { return { ...i, Views: 0, PicUrl: "", PicId: index, LastUpdate: GetDateTime() } }));
-    setItems(GlobalItems.map((i, index) => { return { ...i, Views: 0, PicId: index, LastUpdate: GetDateTime() } }));
+    //setItems(GlobalItems.map((i, index) => { return { ...i, Views: 0, PicId: index, LastUpdate: GetDateTime() } }));
+    setItems(GlobalItems);
 
 
 
@@ -107,6 +123,8 @@ function App() {
     // get highest id of current array
     Items.push({ Views: 0, id: (1000 + Items.length), PicId: (1000 + Items.length), LastUpdate: GetDateTime(), PicUrl: NewItem.PicUrl, title: NewItem.Title });
     const NewItems = [...Items];
+
+    localStorage.setItem(localStorageKey, JSON.stringify(NewItems));
 
     setItems(NewItems);
     setPage(1);  // back to main...
@@ -144,6 +162,8 @@ function App() {
       const NewItems = Items.sort(function (a, b) { return b.Views - a.Views }).map(i => ({ ...i, Views: (i.Views), LastUpdate: i.LastUpdate }));
       console.log(NewItems);
       //debugger;
+
+      localStorage.setItem(localStorageKey, JSON.stringify(NewItems));
       setItems(NewItems);
     }
     //debugger;

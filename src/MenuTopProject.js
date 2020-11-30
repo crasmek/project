@@ -1,7 +1,7 @@
 import React from 'react';
 
 function MenuTopProject(props) {
-return <div>
+return <div className="topnavItay">
 <div>
 <nav className="hebrew col-12 navbar navbar-expand-md bg-dark navbar-dark">
     <div className="container">

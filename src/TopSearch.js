@@ -3,6 +3,19 @@
 import React from 'react';
 
 function TopSearch(props) {
+    const onInputChange = (e) => {
+        //console.log(e.target.name, e.target.value);
+        //alert(e.target.value);
+        props.onClickMe(e.target.value);
+    }
+
+    const onRadioClickViews = (e) => {
+        props.onClickRadio(0);
+    }
+    const onRadioClickDate = (e) => {
+        props.onClickRadio(1);
+    }
+
     return <>
         <h1 className="text-right">המתכונים שלי</h1>
 
@@ -13,13 +26,13 @@ function TopSearch(props) {
             <div className="form-group">
                 <div className="form-check-inline">
                     <label className="form-check-label">
-                        <input type="radio" name="orderProp" className="form-check-input ng-pristine ng-untouched ng-valid ng-not-empty" ng-model="byPropName" value="views" />הכי
+                        <input type="radio" checked={props.radioSelected==0} onClick={onRadioClickViews} name="orderProp" className="form-check-input ng-pristine ng-untouched ng-valid ng-not-empty" ng-model="byPropName" value="views" />הכי
                 פופולאריים
             </label>
                 </div>
                 <div className="form-check-inline">
                     <label className="form-check-label">
-                        <input type="radio" name="orderProp" className="form-check-input ng-pristine ng-untouched ng-valid ng-not-empty" ng-model="byPropName" value="createdAt" />הכי חדשים
+                        <input type="radio" checked={props.radioSelected==1}  onClick={onRadioClickDate} name="orderProp" className="form-check-input ng-pristine ng-untouched ng-valid ng-not-empty" ng-model="byPropName" value="createdAt" />הכי חדשים
             </label>
                 </div>
             </div>
@@ -29,7 +42,7 @@ function TopSearch(props) {
             <div className="col-lg-6">
                 {/* <!-- Search form --> */}
                 <div className="md-form active-pink active-pink-2 mb-3 mt-0">
-                    <input type="text" className="form-control ng-pristine ng-untouched ng-valid ng-empty" placeholder="חיפוש מתכון" ng-model="searchText" aria-label="Search" ng-change="findRecipe()" />
+                    <input onKeyUp={onInputChange} type="text" className="form-control ng-pristine ng-untouched ng-valid ng-empty" placeholder="חיפוש מתכון" ng-model="searchText" aria-label="Search" ng-change="findRecipe()" />
                 </div>
                 <div className="search-results list-group">
                     {/* <!-- recipe in results | limitTo : 10 --> */}
@@ -50,17 +63,17 @@ function TopSearch(props) {
                 </div>
             </div>
             <div className="col-lg-6">
-        <div className="form-check-inline">
-            <label className="form-check-label">
-                <input type="radio" className="form-check-input ng-pristine ng-untouched ng-valid ng-not-empty" name="multipleIng" ng-model="isAll" ng-value="true" value="true"/>כולם
+                <div className="form-check-inline">
+                    <label className="form-check-label">
+                        <input type="radio" className="form-check-input ng-pristine ng-untouched ng-valid ng-not-empty" name="multipleIng" ng-model="isAll" ng-value="true" value="true" />כולם
             </label>
-        </div>
-        <div className="form-check-inline">
-            <label className="form-check-label">
-                <input type="radio" className="form-check-input ng-pristine ng-untouched ng-valid ng-not-empty" name="multipleIng" ng-model="isAll" ng-value="false" value="false"/>לפחות אחד
+                </div>
+                <div className="form-check-inline">
+                    <label className="form-check-label">
+                        <input type="radio" className="form-check-input ng-pristine ng-untouched ng-valid ng-not-empty" name="multipleIng" ng-model="isAll" ng-value="false" value="false" />לפחות אחד
             </label>
-        </div>
-    </div>        </div>
+                </div>
+            </div>        </div>
 
     </>
 }

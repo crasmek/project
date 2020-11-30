@@ -1,6 +1,8 @@
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+
 //const {getData} = require('./api/jsonPlaceholder');
 import { GetDateTime } from './utils/time.js';
-
+import {GetProperDate} from './utils/time.js';
 
 import React, { useState, useEffect } from 'react';
 import './App.css';
@@ -12,9 +14,10 @@ import ItemDetailed from './ItemDetailed';
 import AddItem from './AddItem.js';
 
 import { getRecipes } from "./utils/edamam";
+import { getStations } from "./utils/ImsApi"; //new itay for weather
 
 
-const localStorageKey="recipeProjectApplseeds";
+const localStorageKey = "recipeProjectApplseeds";
 
 
 function App() {
@@ -71,11 +74,14 @@ function App() {
 
   //const [peopleState, setPeopleState] = useState((People=>{People.forEach(p => p.LastUpdate = GetDateTime());return People;})(People) );
   // use above example to set lastupdate
+  const [itemFilter, setItemFilter] = useState('');
   const [Items, setItems] = useState(ItemsDefault);
   //const [IsMainPage, setMainPage] = useState(true);
   const [PageNumber, setPage] = useState(1);
   const [chosenItemImageUrl, setChosenImageUrl] = useState("");
   const [chosenTitle, setChosenTitle] = useState("");
+
+
   // need to get items from internet using fetch
 
   let BaseUrl = 'https://jsonplaceholder.typicode.com/';
@@ -94,16 +100,24 @@ function App() {
 
     //let jsonUsers;
 
-    if(!localStorage.getItem(localStorageKey)){
-        //jsonUsers = await getUsers();
-        const apiRecipes=await getRecipes(0, 16, "icecream");
-        GlobalItems=apiRecipes.map((i, index) => { return { ...i, Views: 0, PicId: index, LastUpdate: GetDateTime() } });
+    // commented out following row, for production:
+    const imsData = await getStations(); 
+    //console.log(`${imsData}`);
 
 
-        localStorage.setItem(localStorageKey, JSON.stringify(GlobalItems));
-    }else{
-        GlobalItems = JSON.parse(localStorage.getItem(localStorageKey));
-    }
+
+//    if (!localStorage.getItem(localStorageKey)) {
+      //jsonUsers = await getUsers();
+      const apiRecipes = await getRecipes(0, 16, "icecream");
+      GlobalItems = apiRecipes.map((i, index) => { return { ...i, Views: 0, PicId: index, LastUpdate: GetDateTime() ,date:GetProperDate()} });
+
+
+      localStorage.setItem(localStorageKey, JSON.stringify(GlobalItems));
+    // } else {
+    //   GlobalItems = JSON.parse(localStorage.getItem(localStorageKey));
+
+      
+    // }
 
     //const apiRecipes = await getRecipes(0, 16, "icecream"); // itay commented out
 
@@ -113,15 +127,28 @@ function App() {
     //GlobalItems=apiRecipes;
     //setItems(GlobalItems.map((i, index) => { return { ...i, Views: 0, PicUrl: "", PicId: index, LastUpdate: GetDateTime() } }));
     //setItems(GlobalItems.map((i, index) => { return { ...i, Views: 0, PicId: index, LastUpdate: GetDateTime() } }));
+    GlobalItems.sort(Sorts[sortType]);
     setItems(GlobalItems);
 
 
 
   }, []);
 
+  function FilterItems(str) {
+    // do the filter, and update state logic here
+    //alert('from filter '+str);
+    // do filter, don't change local storage
+    //const FilteredItems=Items.filter(i=>i.title.indexOf(str!==-1));
+
+    //setItems(FilterItems);
+    //alert(str);
+    setItemFilter(str);
+
+  }
+
   function AddItemToArray(NewItem) {
     // get highest id of current array
-    Items.push({ Views: 0, id: (1000 + Items.length), PicId: (1000 + Items.length), LastUpdate: GetDateTime(), PicUrl: NewItem.PicUrl, title: NewItem.Title });
+    Items.push({ Views: 0, id: (1000 + Items.length), PicId: (1000 + Items.length), LastUpdate: GetDateTime(),date:GetProperDate(), PicUrl: NewItem.PicUrl, title: NewItem.Title });
     const NewItems = [...Items];
 
     localStorage.setItem(localStorageKey, JSON.stringify(NewItems));
@@ -146,6 +173,23 @@ function App() {
     //console.log(`Page Number is ${PageNumber}`);
   }
 
+  const SortByPopular=function (a, b) { return b.Views - a.Views };
+
+  const SortByDate=function (a, b) { return b.date - a.date };
+
+  const [sortType,setSortType]=useState(0);
+
+  const Sorts=[SortByPopular,SortByDate];
+
+  function ChangeSortType(newSort)
+  {
+    //alert(newSort);
+    setSortType(newSort);   // change sort type
+    const NewItems = Items.sort(Sorts[newSort]).map(i => ({ ...i, Views: (i.Views), LastUpdate: i.LastUpdate }));
+    setItems(NewItems);
+  }
+
+
 
   function changePageByState(item, imageUrl) {
     //    if (IsMainPage) {  // only update views if state is main page
@@ -154,12 +198,13 @@ function App() {
       setChosenImageUrl(imageUrl); // picture 
       console.log(`new chosen image url is ${imageUrl}`);
       item.Views++;
-      item.LastUpdate=GetDateTime();
+      item.LastUpdate = GetDateTime();
+      item.date=GetProperDate();
       console.log('item is:');
       console.log(item);
       setChosenTitle(item.title);
 
-      const NewItems = Items.sort(function (a, b) { return b.Views - a.Views }).map(i => ({ ...i, Views: (i.Views), LastUpdate: i.LastUpdate }));
+      const NewItems = Items.sort(Sorts[sortType]).map(i => ({ ...i, Views: (i.Views), LastUpdate: i.LastUpdate }));
       console.log(NewItems);
       //debugger;
 
@@ -180,13 +225,18 @@ function App() {
       <MenuTopProject onClickMe={GoToNewItemPage} />
 
       <div className="container mt-3 hebrew App">
+
+
         {/* The actual recipe: */}
         {/* {!IsMainPage && */}
-        {PageNumber == 2 &&
+
+        {
+          PageNumber == 2 &&
           <>
             <ItemDetailed title={chosenTitle} url={chosenItemImageUrl} Me={{}} onClickMe={changePageByState} />
           </>
         }
+
 
         {
           PageNumber == 3 &&
@@ -203,14 +253,14 @@ function App() {
         {/* {IsMainPage && */}
         {PageNumber == 1 &&
           <>
-            <TopSearch />
+            <TopSearch radioSelected={sortType} onClickRadio={ChangeSortType} onClickMe={FilterItems} />
 
             <div className="card-deck" >
 
               <div className="row flex-grow-1" >
                 {
                   //console.log(IsMainPage)
-                  Items.map((i, index) => <Item PicUrl={i.PicUrl} LastUpdate={i.LastUpdate} Me={i} Views={i.Views} onClickMe={changePageByState} key={index} url={Images[i.PicId % Images.length].url} Itemname={i.title} email='itaysen@gmail.com' />)
+                  Items.filter(i=>i.title.toLowerCase().indexOf(itemFilter.toLowerCase())!==-1).map((i, index) => <Item PicUrl={i.PicUrl} LastUpdate={i.LastUpdate} Me={i} Views={i.Views} onClickMe={changePageByState} key={index} url={Images[i.PicId % Images.length].url} Itemname={i.title} email='itaysen@gmail.com' />)
                 }
               </div>
 

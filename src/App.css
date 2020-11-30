@@ -8,6 +8,27 @@ body
   background-size: cover;
 }
 */
+
+/* fixed menu - doesn't work!! */
+/* body
+{
+  margin-top: 0;
+}
+div.root
+{
+  margin-top: 0;
+}
+
+.topnavItay
+{
+  position: fixed;
+  z-index: 33;
+  width: 100%;
+  background-color: red;
+  padding-top:1em;
+  margin-top:0;
+} */
+
 .mainItemError
 {
   /*height: 100% !important;*/

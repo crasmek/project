@@ -6,6 +6,11 @@ function leftZero(s, maxLength) // used for hours/minutes/seconds with trailing 
   return s;
 }
 
+function GetProperDate()
+{
+  return Date.now()
+}
+
 function GetDateTime() {
   var currentdate = new Date();
   var datetime = 
@@ -25,3 +30,4 @@ function GetDateTime() {
 };
 */
 export {GetDateTime};
+export {GetProperDate};

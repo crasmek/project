@@ -15,6 +15,7 @@ import AddItem from './AddItem.js';
 
 import { getRecipes } from "./utils/edamam";
 import { getStations } from "./utils/ImsApi"; //new itay for weather
+import { GetRainSpecificStation } from "./utils/ImsApi"; //new itay for weather
 
 
 const localStorageKey = "recipeProjectApplseeds";
@@ -101,15 +102,26 @@ function App() {
     //let jsonUsers;
 
     // commented out following row, for production:
-    const imsData = await getStations(); 
-    //console.log(`${imsData}`);
+    const weatherStations = await getStations(); 
+    var specificRain= await GetRainSpecificStation(43,20);
+    specificRain= await GetRainSpecificStation(59,1);
+    console.log(weatherStations);
+
+    //alert(weatherStations);
+
+
+    // load stations, name , and Rain channel, add pic? 
+
 
 
 
 //    if (!localStorage.getItem(localStorageKey)) {
       //jsonUsers = await getUsers();
       const apiRecipes = await getRecipes(0, 16, "icecream");
-      GlobalItems = apiRecipes.map((i, index) => { return { ...i, Views: 0, PicId: index, LastUpdate: GetDateTime() ,date:GetProperDate()} });
+      //GlobalItems = apiRecipes.map((i, index) => { return { ...i, Views: 0, PicId: index, LastUpdate: GetDateTime() ,date:GetProperDate()} });
+    // Weather: now iterate...
+    GlobalItems = weatherStations.map((i, index) => { return { ...i, Views: -1, PicUrl: apiRecipes[index % apiRecipes.length].PicUrl , LastUpdate: GetDateTime() ,date:GetProperDate()} });
+    // -1 means no data....
 
 
       localStorage.setItem(localStorageKey, JSON.stringify(GlobalItems));
@@ -191,13 +203,25 @@ function App() {
 
 
 
-  function changePageByState(item, imageUrl) {
+  async function changePageByState(item, imageUrl) {
     //    if (IsMainPage) {  // only update views if state is main page
     if (PageNumber == 1) {  // only update views if state is main page
       //url     
       setChosenImageUrl(imageUrl); // picture 
       console.log(`new chosen image url is ${imageUrl}`);
-      item.Views++;
+
+      //item.Views++;
+//await GetRainSpecificStation(43,20);
+      // Views is really rainfall, so call:
+      if (item.channelId)
+      {
+        const rain=await GetRainSpecificStation(item.stationId,item.channelId);
+        item.Views=rain;
+
+
+      }
+
+
       item.LastUpdate = GetDateTime();
       item.date=GetProperDate();
       console.log('item is:');
